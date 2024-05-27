@@ -1,0 +1,6 @@
+@GrpcDemoRESTService_HostAddress = http://localhost:5023
+
+GET {{GrpcDemoRESTService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
