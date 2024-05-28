@@ -11,6 +11,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.MapGrpcService<GreeterService>();
 app.MapGrpcService<WeatherService>();
+app.MapGrpcService<NotifierService>();
 if (app.Environment.IsDevelopment())
 {
     app.MapGrpcReflectionService();

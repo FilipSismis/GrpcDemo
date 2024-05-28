@@ -154,10 +154,10 @@ namespace GrpcDemoClient
                 }
             });
 
-            foreach (var msg in new[] { "Tom", "Jones" })
+            foreach (var msg in new[] { "Tom", "John" })
             {
                 var request = new NotificationsRequest()
-                { Message = $"Hello {msg}", From = "Mom", To = msg };
+                { Message = $"Hello {msg}", From = "Filip", To = msg };
                 //opatovny call cez rovnaky stream na server
                 await call.RequestStream.WriteAsync(request);
             }
