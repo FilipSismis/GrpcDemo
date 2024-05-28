@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package notify;
+
+service Notifier {
+   rpc ChatNotification(stream NotificationsRequest) returns (stream NotificationsResponse);  
+}
+
+message NotificationsRequest {
+  string message = 1;
+  string to = 2;
+  string from = 3;
+}
+
+message NotificationsResponse{  
+  string message = 1;
+  google.protobuf.Timestamp receivedAt = 3;
+}

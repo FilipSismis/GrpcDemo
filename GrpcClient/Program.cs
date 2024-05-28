@@ -1,10 +1,12 @@
 ﻿using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Greet;
+using Grpc.Core;
 using Grpc.Net.Client;
-using Weather;
+using Notify;
 using System.Net.Http.Headers;
 using System.Text;
-using Google.Protobuf.WellKnownTypes;
+using Weather;
 
 namespace GrpcDemoClient
 {
@@ -15,24 +17,30 @@ namespace GrpcDemoClient
         {
             var channel = GrpcChannel.ForAddress(Address);
 
-            
-            var data = new List<(string message, int grpcByteSize, int restByteSize)>();
-            var firstGrpcMessage = await SayNumber(channel);
-            var firstRestMessage = await GetRestMessage("number");
-            var firstGrpcMessageLength = GetGrpcByteLength(firstGrpcMessage);
-            var firstRestMessageLength = await GetRestByteLength(firstRestMessage);
-            data.Add(("1", firstGrpcMessageLength, firstRestMessageLength));
-            var secondGrpcMessage = await SayHello(channel);
-            var secondRestMessage = await GetRestMessage("greet?name=World!");
-            var secondGrpcMessageLength = GetGrpcByteLength(secondGrpcMessage);
-            var secondRestMessageLength = await GetRestByteLength(secondRestMessage);
-            data.Add(("Hello World!", secondGrpcMessageLength, secondRestMessageLength));
-            var thirdGrpcMessage = await GetWeather(channel);
-            var thirdRestMessage = await GetRestMessage("weather");
-            var thirdGrpcMessageLength = GetGrpcByteLength(thirdGrpcMessage);
-            var thirdRestMessageLength = await GetRestByteLength(thirdRestMessage);
-            data.Add(("Weather reply object", thirdGrpcMessageLength, thirdRestMessageLength));
-            PrintOut(data);
+            #region streaming example
+            await StreamingExample(channel);
+            #endregion
+
+            #region comparison example
+            //var data = new List<(string message, int grpcByteSize, int restByteSize)>();
+            //var firstGrpcMessage = await SayNumber(channel);
+            //var firstRestMessage = await GetRestMessage("number");
+            //var firstGrpcMessageLength = GetGrpcByteLength(firstGrpcMessage);
+            //var firstRestMessageLength = await GetRestByteLength(firstRestMessage);
+            //data.Add(("1", firstGrpcMessageLength, firstRestMessageLength));
+            //var secondGrpcMessage = await SayHello(channel);
+            //var secondRestMessage = await GetRestMessage("greet?name=World!");
+            //var secondGrpcMessageLength = GetGrpcByteLength(secondGrpcMessage);
+            //var secondRestMessageLength = await GetRestByteLength(secondRestMessage);
+            //data.Add(("Hello World!", secondGrpcMessageLength, secondRestMessageLength));
+            //var thirdGrpcMessage = await GetWeather(channel);
+            //var thirdRestMessage = await GetRestMessage("weather");
+            //var thirdGrpcMessageLength = GetGrpcByteLength(thirdGrpcMessage);
+            //var thirdRestMessageLength = await GetRestByteLength(thirdRestMessage);
+            //data.Add(("Weather reply object", thirdGrpcMessageLength, thirdRestMessageLength));
+            //PrintOut(data);
+            #endregion
+
             Console.ReadKey();
         }
 
@@ -79,6 +87,7 @@ namespace GrpcDemoClient
         }
         #endregion
 
+        #region Comparison example
         private static async Task<HelloReply> SayHello(GrpcChannel channel)
         {
             var client = new Greeter.GreeterClient(channel);
@@ -127,5 +136,35 @@ namespace GrpcDemoClient
             }
             return 0;
         }
+        #endregion
+
+        #region Streaming example
+        private static async Task StreamingExample(GrpcChannel channel)
+        {
+            var client = new Notifier.NotifierClient(channel);
+            using var call = client.ChatNotification();
+
+            var responseReaderTask = Task.Run(async Task () =>
+            {
+                //opatovny read zo serveru cez stream
+                while (await call.ResponseStream.MoveNext())
+                {
+                    var note = call.ResponseStream.Current;
+                    Console.WriteLine($"{note.Message}, received at {note.ReceivedAt}");
+                }
+            });
+
+            foreach (var msg in new[] { "Tom", "Jones" })
+            {
+                var request = new NotificationsRequest()
+                { Message = $"Hello {msg}", From = "Mom", To = msg };
+                //opatovny call cez rovnaky stream na server
+                await call.RequestStream.WriteAsync(request);
+            }
+
+            await call.RequestStream.CompleteAsync();
+            await responseReaderTask;
+        }
+        #endregion
     }
 }

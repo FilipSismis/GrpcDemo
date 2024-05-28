@@ -8,9 +8,10 @@
 
   <ItemGroup>
 	<Protobuf Include="..\Protos\greet.proto" GrpcServices="Server" Link="Protos\greet.proto" />
-	  <Protobuf Include="..\Protos\weather.proto" GrpcServices="Server" Link="Protos\weather.proto" />
+    <Protobuf Include="..\Protos\weather.proto" GrpcServices="Server" Link="Protos\weather.proto" />
+    <Protobuf Include="..\Protos\notify.proto" GrpcServices="Server" Link="Protos\notify.proto" />
 
-	  <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
 	  <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.63.0" />
 	  <PackageReference Include="Grpc.Reflection" Version="2.63.0" />
   </ItemGroup>
