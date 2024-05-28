@@ -6,6 +6,7 @@ using Grpc.Net.Client;
 using Notify;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Web;
 using Ticket;
 using Weather;
 
@@ -16,9 +17,17 @@ namespace GrpcDemoClient
         public const string Address = "https://localhost:7101";
         static async Task Main(string[] args)
         {
-            var httpHandler = new HttpClientHandler();
-            httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-            var channel = GrpcChannel.ForAddress(Address, new GrpcChannelOptions { HttpHandler = httpHandler });
+            var channel = GrpcChannel.ForAddress(Address);
+
+            #region basic example
+
+            var client = new Greeter.GreeterClient(channel);
+            HelloRequest request = new HelloRequest { Name = "World!" };
+            var response = await client.SayHelloAsync(request);
+
+            Console.WriteLine(response.Message);
+
+            #endregion
 
             #region comparison example
 
@@ -49,41 +58,40 @@ namespace GrpcDemoClient
             #endregion
 
             #region Authorization example
-            
 
-            var client = new Ticketer.TicketerClient(channel);
+            //var client = new Ticketer.TicketerClient(channel);
 
-            Console.WriteLine("gRPC Ticketer");
-            Console.WriteLine();
-            Console.WriteLine("Press a key:");
-            Console.WriteLine("1: Get available tickets");
-            Console.WriteLine("2: Purchase ticket");
-            Console.WriteLine("3: Authenticate");
-            Console.WriteLine("4: Exit");
-            Console.WriteLine();
+            //Console.WriteLine("gRPC Ticketer");
+            //Console.WriteLine();
+            //Console.WriteLine("Press a key:");
+            //Console.WriteLine("1: Get available tickets");
+            //Console.WriteLine("2: Purchase ticket");
+            //Console.WriteLine("3: Authenticate");
+            //Console.WriteLine("4: Exit");
+            //Console.WriteLine();
 
-            string? token = null;
+            //string? token = null;
 
-            var exiting = false;
-            while (!exiting)
-            {
-                var consoleKeyInfo = Console.ReadKey(intercept: true);
-                switch (consoleKeyInfo.KeyChar)
-                {
-                    case '1':
-                        await GetAvailableTickets(client);
-                        break;
-                    case '2':
-                        await PurchaseTicket(client, token);
-                        break;
-                    case '3':
-                        token = Authenticate();
-                        break;
-                    case '4':
-                        exiting = true;
-                        break;
-                }
-            }
+            //var exiting = false;
+            //while (!exiting)
+            //{
+            //    var consoleKeyInfo = Console.ReadKey(intercept: true);
+            //    switch (consoleKeyInfo.KeyChar)
+            //    {
+            //        case '1':
+            //            await GetAvailableTickets(client);
+            //            break;
+            //        case '2':
+            //            await PurchaseTicket(client, token);
+            //            break;
+            //        case '3':
+            //            token = await Authenticate();
+            //            break;
+            //        case '4':
+            //            exiting = true;
+            //            break;
+            //    }
+            //}
 
             #endregion
 
@@ -250,9 +258,22 @@ namespace GrpcDemoClient
             Console.WriteLine("Available ticket count: " + response.Count);
         }
 
-        private static string Authenticate()
+        private static async Task<string> Authenticate()
         {
-            var token = "";
+            Console.WriteLine($"Authenticating as {Environment.UserName}...");
+            using var httpClient = new HttpClient();
+            using var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{Address}/generateJwtToken?name={HttpUtility.UrlEncode(Environment.UserName)}"),
+                Method = HttpMethod.Get,
+                Version = new Version(2, 0)
+            };
+            using var tokenResponse = await httpClient.SendAsync(request);
+            tokenResponse.EnsureSuccessStatusCode();
+
+            var token = await tokenResponse.Content.ReadAsStringAsync();
+            Console.WriteLine("Successfully authenticated.");
+
             return token;
         }
 
