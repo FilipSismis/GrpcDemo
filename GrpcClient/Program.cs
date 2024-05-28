@@ -19,6 +19,7 @@ namespace GrpcDemoClient
             var channel = GrpcChannel.ForAddress(Address);
 
             #region comparison example
+
             //var data = new List<(string message, int grpcByteSize, int restByteSize)>();
             //var firstGrpcMessage = await SayNumber(channel);
             //var firstRestMessage = await GetRestMessage("number");
@@ -36,14 +37,17 @@ namespace GrpcDemoClient
             //var thirdRestMessageLength = await GetRestByteLength(thirdRestMessage);
             //data.Add(("Weather reply object", thirdGrpcMessageLength, thirdRestMessageLength));
             //PrintOut(data);
+
             #endregion
 
             #region streaming example
-            await StreamingExample(channel);
+
+            //await StreamingExample(channel);
+
             #endregion
 
             #region Authorization example
-            
+
             var client = new Ticketer.TicketerClient(channel);
 
             Console.WriteLine("gRPC Ticketer");
