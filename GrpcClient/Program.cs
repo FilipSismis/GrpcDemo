@@ -16,7 +16,9 @@ namespace GrpcDemoClient
         public const string Address = "https://localhost:7101";
         static async Task Main(string[] args)
         {
-            var channel = GrpcChannel.ForAddress(Address);
+            var httpHandler = new HttpClientHandler();
+            httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            var channel = GrpcChannel.ForAddress(Address, new GrpcChannelOptions { HttpHandler = httpHandler });
 
             #region comparison example
 
@@ -47,6 +49,7 @@ namespace GrpcDemoClient
             #endregion
 
             #region Authorization example
+            
 
             var client = new Ticketer.TicketerClient(channel);
 
