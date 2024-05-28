@@ -14,5 +14,7 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.63.0" />
 	  <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.63.0" />
 	  <PackageReference Include="Grpc.Reflection" Version="2.63.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.5" />
+	  <PackageReference Include="Microsoft.Identity.Web" Version="2.18.2" />
   </ItemGroup>
 </Project>
