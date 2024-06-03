@@ -21,11 +21,11 @@ namespace GrpcDemoClient
 
             #region basic example
 
-            var client = new Greeter.GreeterClient(channel);
-            HelloRequest request = new HelloRequest { Name = "World!" };
-            var response = await client.SayHelloAsync(request);
+            //var client = new Greeter.GreeterClient(channel);
+            //HelloRequest request = new HelloRequest { Name = "World!" };
+            //var response = await client.SayHelloAsync(request);
 
-            Console.WriteLine(response.Message);
+            //Console.WriteLine(response.Message);
 
             #endregion
 
@@ -59,39 +59,39 @@ namespace GrpcDemoClient
 
             #region Authorization example
 
-            //var client = new Ticketer.TicketerClient(channel);
+            var client = new Ticketer.TicketerClient(channel);
 
-            //Console.WriteLine("gRPC Ticketer");
-            //Console.WriteLine();
-            //Console.WriteLine("Press a key:");
-            //Console.WriteLine("1: Get available tickets");
-            //Console.WriteLine("2: Purchase ticket");
-            //Console.WriteLine("3: Authenticate");
-            //Console.WriteLine("4: Exit");
-            //Console.WriteLine();
+            Console.WriteLine("gRPC Ticketer");
+            Console.WriteLine();
+            Console.WriteLine("Press a key:");
+            Console.WriteLine("1: Get available tickets");
+            Console.WriteLine("2: Purchase ticket");
+            Console.WriteLine("3: Authenticate");
+            Console.WriteLine("4: Exit");
+            Console.WriteLine();
 
-            //string? token = null;
+            string? token = null;
 
-            //var exiting = false;
-            //while (!exiting)
-            //{
-            //    var consoleKeyInfo = Console.ReadKey(intercept: true);
-            //    switch (consoleKeyInfo.KeyChar)
-            //    {
-            //        case '1':
-            //            await GetAvailableTickets(client);
-            //            break;
-            //        case '2':
-            //            await PurchaseTicket(client, token);
-            //            break;
-            //        case '3':
-            //            token = await Authenticate();
-            //            break;
-            //        case '4':
-            //            exiting = true;
-            //            break;
-            //    }
-            //}
+            var exiting = false;
+            while (!exiting)
+            {
+                var consoleKeyInfo = Console.ReadKey(intercept: true);
+                switch (consoleKeyInfo.KeyChar)
+                {
+                    case '1':
+                        await GetAvailableTickets(client);
+                        break;
+                    case '2':
+                        await PurchaseTicket(client, token);
+                        break;
+                    case '3':
+                        token = await Authenticate();
+                        break;
+                    case '4':
+                        exiting = true;
+                        break;
+                }
+            }
 
             #endregion
 
